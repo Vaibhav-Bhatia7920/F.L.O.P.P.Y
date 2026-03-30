@@ -1,5 +1,5 @@
 import chromadb
 
-path = "./chromadb"
-client = chromadb.PersistentClient(path=path)
-collection = client.get_or_create_collection(name="documents")
+if __name__ == "__main__":
+    client = chromadb.PersistentClient(path="./chromadb")
+    collection = client.get_or_create_collection(name="documents")

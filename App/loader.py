@@ -35,12 +35,46 @@ def read_files(pdf_files, docx_files, txt_files):
     return pdf_content, docx_content, txt_content
 
 
-def chunk_files(pdf_content, docx_content, txt_content):
+def chunk_files(directory):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    pdf_chunks = [text_splitter.create_documents([content]) for content in pdf_content]
-    docx_chunks = [text_splitter.create_documents([content]) for content in docx_content]
-    txt_chunks = [text_splitter.create_documents([content]) for content in txt_content]
-    return pdf_chunks, docx_chunks, txt_chunks
+    all_chunks = []
+    for file in directory.iterdir():
+        if not file.is_file():
+            break
+        
+        text = ""
+        if file.suffix == ".pdf":
+            reader = PdfReader(file)
+            for page in reader.pages:
+                txt += page.extract_text()
+                
+        elif file.suffix == ".docx":
+            doc = Document(file)
+            for para in doc.paragraphs:
+                text += para.text + "\n"
+            file_type = "docx"
+
+        elif file.suffix == ".txt":
+            with open(file, "r", encoding="utf-8") as f:
+                text = f.read()
+            file_type = "txt"
+
+        else:
+            continue
+
+        chunks = text_splitter.split_text(text)
+
+        for i, chunk in enumerate(chunks):
+            all_chunks.append({
+                "text": chunk,
+                "source": file.name,
+                "type": file_type,
+                "path": str(file),
+                "chunk_id": i,
+                "total_chunks": len(chunks)
+            })
+
+    return all_chunks
 
 if __name__ == "__main__":
     directory = Path('path/to/your/directory')

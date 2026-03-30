@@ -13,6 +13,32 @@ def construct_prompt(user_input , context):
     {user_input}
     """
     return prompt
+
+def chat(messages, tools):
+
+    system_prompt = f"""You are an AI agent. 
+    You MUST use the provided tools to answer questions about files. 
+    Do NOT respond with empty content. 
+    If a tool is available, ALWAYS call it."""
+
+    formatted_messages = [
+        {"role": "system", "content": system_prompt}
+    ] + messages
+
+    params = {
+        "model": "llama3.1:latest",
+        "messages": formatted_messages,
+        "tools": tools,
+        "stream": False
+    }
+
+    response = requests.post(
+        "http://localhost:11434/api/chat",
+        json=params
+    )
+
+    return response.json()
+
 if __name__ == "__main__":
     pass
     
