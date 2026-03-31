@@ -45,12 +45,16 @@ TOOLS_SCHEMA = [
             "parameters": {
                 "type": "object",
                 "properties": {
+                    "directory": {
+                        "type": "string",
+                        "description": "The directory to search within"
+                    },
                     "query": {
                         "type": "string",
                         "description": "The search term or keyword"
                     }
                 },
-                "required": ["query"]
+                "required": ["directory", "query"]
             }
         }
     },
@@ -62,12 +66,12 @@ TOOLS_SCHEMA = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "filename": {
+                    "file_path": {
                         "type": "string",
-                        "description": "The name of the file to summarize"
+                        "description": "The path to the file to summarize"
                     }
                 },
-                "required": ["filename"]
+                "required": ["file_path"]
             }
         }
     }
@@ -87,6 +91,7 @@ def agent_loop(user_input):
     messages = [{"role": "user", "content": user_input}]
 
     for loop_itr in range(5):
+        print(messages)
         response = chat(messages, TOOLS_SCHEMA)
         print("DEBUG:", response)
 
@@ -100,7 +105,7 @@ def agent_loop(user_input):
         if tool_calls and tool_calls[0]['function']['name'] != "":
             if not tool_calls:
                 return "No tool call found."
-
+            
             tool_call = tool_calls[0]  # single tool for now
             tool_name = tool_call['function'].get("name")
             tool_args = tool_call['function'].get("arguments", {})
@@ -120,7 +125,7 @@ def agent_loop(user_input):
                 "role": "assistant",
                 "content": response["message"].get("content", "")
             })
-
+            print(tool_output)
             # Append tool result
             messages.append({
                 "role": "tool",

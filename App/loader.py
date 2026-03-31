@@ -40,9 +40,10 @@ def chunk_files(directory):
     all_chunks = []
     for file in directory.iterdir():
         if not file.is_file():
-            break
+            continue
         
         text = ""
+        print(file)
         if file.suffix == ".pdf":
             reader = PdfReader(file)
             for page in reader.pages:
@@ -69,10 +70,12 @@ def chunk_files(directory):
                 "text": chunk,
                 "source": file.name,
                 "type": file_type,
-                "path": str(file),
+                "path": str(Path(file).resolve()),
                 "chunk_id": i,
                 "total_chunks": len(chunks)
             })
+            print("Hi")
+            print(str(Path(file).resolve()))
 
     return all_chunks
 

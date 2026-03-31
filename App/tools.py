@@ -1,4 +1,5 @@
 from pathlib import Path
+from indexer import generate_embedding
 from loader import chunk_files
 from sklearn.metrics.pairwise import cosine_similarity
 from llm import query_llm
@@ -13,13 +14,17 @@ def read_file(file_path):
     
 def search_files(directory, query):
     
+    print("hi")
+    query_embedding = generate_embedding(query)
     collection = chromadb.PersistentClient(path="./chromadb").get_or_create_collection(name="documents")
     result = collection.query(
-        query_texts=[query],
+        query_embeddings=[query_embedding],
         n_results=1
     )
-    
-    return result["documents"][0][0], result["metadatas"][0][0]["path"]
+    print(result)
+    print(result["documents"])
+    print(result["metadatas"])
+    return {"file_path": result["metadatas"][0][0]["path"]}
     # chunks = chunk_files(directory)
     # embeddings = embed_chunks(chunks)
     # query_embedding = generate_embedding(query)
