@@ -15,7 +15,7 @@ def add_to_memory(conversation):
     user_text = conversation.content
 
     cursor.execute("""
-        INSERT INTO coversations (id,session_id, user, user_content)
+        INSERT INTO coversations (id,session_id, user_name, user_content)
         VALUES (%s, %s, %s, %s)
     """, (id, conversation.session_id, user_type, user_text))
     conn.commit()
